@@ -1,0 +1,224 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+    *{
+        margin: 0%;
+        padding: 0%;
+        box-sizing: border-box;
+        font-family: sans-serif;
+    }
+    body{
+    background:  #001e4d;
+    }
+    .container{
+        background-color: #ffffff;
+        width: 90%;
+        max-width: 700px;
+        margin:7em auto 0;
+        border-radius: 10px;
+        padding: 30px;
+    }
+    h1{
+        font-size: 25px;
+        font-weight: 600;
+        color: #001e4d;
+        border-bottom: 1px solid #333;
+        padding-bottom: 30px;
+        text-align: center;
+    }
+    div{
+        margin: 40px 5px;
+        text-align: center;
+    }
+    input{
+        padding: 10px 5px;
+        width: 50%;
+        outline: none;
+        border-radius: 8px;
+        margin-left: -0.5em;
+        font-size: 16px;
+        font-weight: 500;
+    }
+    #currency{
+        padding: 10px 5px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 500;
+        color: #001e4d !important;
+        background-color: white;
+        outline: none;
+        margin-left: 1em;
+    }
+    button{
+        background-color: #222;
+        color: #fff;
+        font-weight: 500;
+        border:none;
+        padding: 0.7em 2em;
+        margin-left: 1em;
+        border-radius: 5px;
+        font-size: 16px;
+    }
+    .hh{
+        font-size: 20px;
+        font-weight: 600;
+        color: #001e4d;
+        border-bottom: none;
+        padding-bottom:30px;
+        text-align:start;
+    }
+    span{
+        font-size: 20px;
+        font-weight: 600;
+        color: #001e4d;
+    }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Currency Converter</h1>
+
+        <div>
+            <input type="text" id="input">
+
+            <select name="" id="currency">
+                <option value="currency">Select currency</option>
+                <option value="naira" id="naira">naira</option>
+                <option value="dollar" id="dollar">dollar</option>
+                <option value="pounds" id="pounds">pounds</option>
+            </select>
+
+            <button id="convet" onclick="convert()">Convert</button>
+        </div>
+        
+
+        <h1 class="hh">Amount in Figure: <span id="screen1"></span></h1>
+        <h1 class="hh">Amount in words: <span id="screen"></span></h1>
+    </div>
+</body>
+    <script>
+        let unit = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine']
+        let Teens = ['ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen']
+        let tens = ['', '', 'twenty', 'thirty', 'fourty', 'fifty','sixty', 'seventy','eighty', 'ninety']
+        let input = document.getElementById('input')
+        let newArr = []
+        let number = 0
+        let screen1 = document.getElementById('screen1')
+        let screen = document.getElementById('screen')
+        let currency = document.getElementById('currency')
+        let sign ;
+        let symbol;
+        function convert() {
+           
+            let val = input.value
+            val = val.toString('')
+            let numbas = val.split('')
+            cutIt(numbas)
+            comma = newArr.join(',')
+            screen1.innerHTML = comma
+            newArr = []
+
+            if (currency.value == "naira" ){
+                symbol = "Naira"
+                sign = "N"
+            
+            } else if (currency.value == "dollar"){
+                sign = "$"
+                symbol = "Dollar"
+            } else if (currency.value == "pounds"){
+                sign = "E"
+                symbol = "Pounds"
+            }
+
+            if(input.value >= 1 && input.value < 10){
+                getunit(input.value)
+            }
+
+            else if (input.value >=10 && input.value < 20  ) {
+                getteens(input.value)
+            }
+            else if (input.value >=20 && input.value < 100 ) {
+                gettens(input.value)
+            }
+            else if(input.value >=100 && input.value < 999){
+                gethundred(input.value)
+            }
+            else if (input.value >= 100 && input.value < 9999){
+                getthousand (input.value)
+            }
+
+
+            screen1.innerHTML = `${sign} ${comma}`
+            input.valu = ''
+
+        }
+
+        function cutIt(numbas) {
+            if (numbas.length > 3) {
+                let add = numbas.splice(-3)
+                newArr.unshift(add.join(''))
+                cutIt(numbas)
+            }else{
+                newArr.unshift(numbas.join(''))
+            }
+        }
+
+        
+
+
+
+
+        function getunit(num) {
+            screen.innerHTML = unit[num] + ' ' + symbol;
+        }
+        function getteens(num) {
+            screen.innerHTML = Teens[num%10]
+        }
+        function gettens(num) {
+            screen.innerHTML = tens[Math.floor(num/10)]+ ' ' + unit[num%10] + ' ' + symbol;
+            return tens[Math.floor(num/10)]+ ' ' + unit[num%10] + ' ' + symbol;
+        }
+
+
+        function gethundred(num) {
+            let word='';
+            word = unit[num/100] + ' hundred'
+
+            if (num%100 > 0 && num%100 < 10) {
+            word = unit[Math.floor(num/100)] + ' hundred and ' + unit[num % 100]
+            }
+            else if (num%100 >=10 && num%100 <20) {
+            word = unit[Math.floor(num/100)] + ' hundred and ' + Teens[num % 10] 
+            }
+            else if (num % 100 >= 20) {
+            word = unit[Math.floor(num/100)] + ' hundred, ' + gettens(num % 100)
+            }
+            screen.innerHTML = word + ' ' + symbol;
+
+            return word + ' ' + symbol;                                 
+        }
+
+        function getthousand(num) {
+            let thousand = '';
+            thousand = unit[num/1000] + ' thousand'
+
+            if (num%1000 >0 && num%1000 < 10) {
+            thousand = unit[Math.floor(num/1000)] + ' thousand and ' + unit[num % 100]
+            }
+            else if (num%1000 >=10 && num%1000 <20) {
+            thousand = unit[Math.floor(num/1000)] + ' thousand and ' + Teens[num % 10] 
+            }
+            else if (num%1000 >= 20 && num%1000 <100) {
+            thousand = unit[Math.floor(num/1000)] + ' thousand and ' + gettens(num % 100)
+            }
+            else if (num%1000 >= 100 && num%1000 <= 999) {
+            thousand = unit[Math.floor(num/1000)] + ' thousand, '  + gethundred(num % 1000)
+            }
+            screen.innerHTML = thousand + ' ' + symbol;
+        }
+        
+    </script>
+</html>

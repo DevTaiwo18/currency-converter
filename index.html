@@ -2,78 +2,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Currency Converter</title>
     <style>
-    *{
-        margin: 0%;
-        padding: 0%;
+    * {
+        margin: 0;
+        padding: 0;
         box-sizing: border-box;
-        font-family: sans-serif;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
-    body{
-    background:  #001e4d;
+    body {
+        background: #001e4d;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
     }
-    .container{
+    .container {
         background-color: #ffffff;
         width: 90%;
         max-width: 700px;
-        margin:7em auto 0;
         border-radius: 10px;
         padding: 30px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
     }
-    h1{
-        font-size: 25px;
+    h1 {
+        font-size: 28px;
         font-weight: 600;
         color: #001e4d;
-        border-bottom: 1px solid #333;
-        padding-bottom: 30px;
+        border-bottom: 1px solid #e1e1e1;
+        padding-bottom: 20px;
         text-align: center;
+        margin-bottom: 30px;
     }
-    div{
-        margin: 40px 5px;
-        text-align: center;
+    .input-group {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        margin: 30px 0;
     }
-    input{
-        padding: 10px 5px;
-        width: 50%;
+    input {
+        padding: 12px 15px;
+        width: 100%;
+        max-width: 250px;
         outline: none;
+        border: 1px solid #ccc;
         border-radius: 8px;
-        margin-left: -0.5em;
         font-size: 16px;
         font-weight: 500;
     }
-    #currency{
-        padding: 10px 5px;
+    input:focus {
+        border-color: #001e4d;
+    }
+    #currency {
+        padding: 12px 15px;
         border-radius: 8px;
         font-size: 16px;
         font-weight: 500;
-        color: #001e4d !important;
+        color: #001e4d;
         background-color: white;
         outline: none;
-        margin-left: 1em;
+        border: 1px solid #ccc;
+        cursor: pointer;
     }
-    button{
-        background-color: #222;
+    #currency:focus {
+        border-color: #001e4d;
+    }
+    button {
+        background-color: #001e4d;
         color: #fff;
         font-weight: 500;
-        border:none;
-        padding: 0.7em 2em;
-        margin-left: 1em;
-        border-radius: 5px;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 8px;
         font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s;
     }
-    .hh{
+    button:hover {
+        background-color: #003380;
+    }
+    .result {
+        margin-top: 30px;
+        padding: 20px;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        border-left: 4px solid #001e4d;
+    }
+    .amount-display {
         font-size: 20px;
         font-weight: 600;
         color: #001e4d;
-        border-bottom: none;
-        padding-bottom:30px;
-        text-align:start;
+        margin-bottom: 15px;
+        display: flex;
+        justify-content: space-between;
     }
-    span{
-        font-size: 20px;
+    .label {
+        color: #555;
+        font-weight: normal;
+    }
+    span.value {
         font-weight: 600;
         color: #001e4d;
+    }
+    .error {
+        color: #d9534f;
+        text-align: center;
+        font-size: 14px;
+        margin-top: 10px;
+        display: none;
     }
     </style>
 </head>
@@ -81,144 +118,151 @@
     <div class="container">
         <h1>Currency Converter</h1>
 
-        <div>
-            <input type="text" id="input">
+        <div class="input-group">
+            <input type="text" id="input" placeholder="Enter amount" inputmode="numeric">
 
-            <select name="" id="currency">
-                <option value="currency">Select currency</option>
-                <option value="naira" id="naira">naira</option>
-                <option value="dollar" id="dollar">dollar</option>
-                <option value="pounds" id="pounds">pounds</option>
+            <select id="currency">
+                <option value="">Select currency</option>
+                <option value="naira">Naira (₦)</option>
+                <option value="dollar">Dollar ($)</option>
+                <option value="pounds">Pounds (£)</option>
+                <option value="euro">Euro (€)</option>
             </select>
 
-            <button id="convet" onclick="convert()">Convert</button>
+            <button id="convert" onclick="convert()">Convert</button>
         </div>
         
+        <div id="error" class="error">Please enter a valid number and select a currency</div>
 
-        <h1 class="hh">Amount in Figure: <span id="screen1"></span></h1>
-        <h1 class="hh">Amount in words: <span id="screen"></span></h1>
+        <div class="result">
+            <div class="amount-display">
+                <span class="label">Amount in Figures:</span>
+                <span id="screen1" class="value">—</span>
+            </div>
+            <div class="amount-display">
+                <span class="label">Amount in Words:</span>
+                <span id="screen" class="value">—</span>
+            </div>
+        </div>
     </div>
-</body>
+
     <script>
-        let unit = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine']
-        let Teens = ['ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen']
-        let tens = ['', '', 'twenty', 'thirty', 'fourty', 'fifty','sixty', 'seventy','eighty', 'ninety']
-        let input = document.getElementById('input')
-        let newArr = []
-        let number = 0
-        let screen1 = document.getElementById('screen1')
-        let screen = document.getElementById('screen')
-        let currency = document.getElementById('currency')
-        let sign ;
-        let symbol;
-        function convert() {
-           
-            let val = input.value
-            val = val.toString('')
-            let numbas = val.split('')
-            cutIt(numbas)
-            comma = newArr.join(',')
-            screen1.innerHTML = comma
-            newArr = []
+        // Number to word conversion arrays
+        const unit = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
+        const teens = ['ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
+        const tens = ['', '', 'twenty', 'thirty', 'forty', 'fifty','sixty', 'seventy','eighty', 'ninety'];
+        
+        // DOM elements
+        const inputEl = document.getElementById('input');
+        const screen1 = document.getElementById('screen1');
+        const screen = document.getElementById('screen');
+        const currencyEl = document.getElementById('currency');
+        const errorEl = document.getElementById('error');
+        
+        // Format number with commas
+        function formatWithCommas(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
 
-            if (currency.value == "naira" ){
-                symbol = "Naira"
-                sign = "N"
+        // Convert number to words
+        function convertNumberToWords(num) {
+            // Handle zero separately
+            if (num === 0) return 'zero';
             
-            } else if (currency.value == "dollar"){
-                sign = "$"
-                symbol = "Dollar"
-            } else if (currency.value == "pounds"){
-                sign = "E"
-                symbol = "Pounds"
-            }
-
-            if(input.value >= 1 && input.value < 10){
-                getunit(input.value)
-            }
-
-            else if (input.value >=10 && input.value < 20  ) {
-                getteens(input.value)
-            }
-            else if (input.value >=20 && input.value < 100 ) {
-                gettens(input.value)
-            }
-            else if(input.value >=100 && input.value < 999){
-                gethundred(input.value)
-            }
-            else if (input.value >= 100 && input.value < 9999){
-                getthousand (input.value)
-            }
-
-
-            screen1.innerHTML = `${sign} ${comma}`
-            input.valu = ''
-
-        }
-
-        function cutIt(numbas) {
-            if (numbas.length > 3) {
-                let add = numbas.splice(-3)
-                newArr.unshift(add.join(''))
-                cutIt(numbas)
-            }else{
-                newArr.unshift(numbas.join(''))
+            // Handle different number ranges
+            if (num < 10) {
+                return unit[num];
+            } else if (num < 20) {
+                return teens[num - 10];
+            } else if (num < 100) {
+                return tens[Math.floor(num / 10)] + (num % 10 !== 0 ? '-' + unit[num % 10] : '');
+            } else if (num < 1000) {
+                return unit[Math.floor(num / 100)] + ' hundred' + 
+                       (num % 100 !== 0 ? ' and ' + convertNumberToWords(num % 100) : '');
+            } else if (num < 1000000) {
+                return convertNumberToWords(Math.floor(num / 1000)) + ' thousand' + 
+                       (num % 1000 !== 0 ? (num % 1000 < 100 ? ' and ' : ', ') + 
+                       convertNumberToWords(num % 1000) : '');
+            } else if (num < 1000000000) {
+                return convertNumberToWords(Math.floor(num / 1000000)) + ' million' + 
+                       (num % 1000000 !== 0 ? (num % 1000000 < 100 ? ' and ' : ', ') + 
+                       convertNumberToWords(num % 1000000) : '');
+            } else {
+                return convertNumberToWords(Math.floor(num / 1000000000)) + ' billion' + 
+                       (num % 1000000000 !== 0 ? (num % 1000000000 < 100 ? ' and ' : ', ') + 
+                       convertNumberToWords(num % 1000000000) : '');
             }
         }
 
-        
-
-
-
-
-        function getunit(num) {
-            screen.innerHTML = unit[num] + ' ' + symbol;
-        }
-        function getteens(num) {
-            screen.innerHTML = Teens[num%10]
-        }
-        function gettens(num) {
-            screen.innerHTML = tens[Math.floor(num/10)]+ ' ' + unit[num%10] + ' ' + symbol;
-            return tens[Math.floor(num/10)]+ ' ' + unit[num%10] + ' ' + symbol;
-        }
-
-
-        function gethundred(num) {
-            let word='';
-            word = unit[num/100] + ' hundred'
-
-            if (num%100 > 0 && num%100 < 10) {
-            word = unit[Math.floor(num/100)] + ' hundred and ' + unit[num % 100]
+        // Main conversion function
+        function convert() {
+            // Reset error message
+            errorEl.style.display = 'none';
+            
+            // Get and validate input
+            const inputValue = inputEl.value.trim();
+            const currencyValue = currencyEl.value;
+            
+            if (!inputValue || isNaN(inputValue) || !currencyValue) {
+                errorEl.style.display = 'block';
+                return;
             }
-            else if (num%100 >=10 && num%100 <20) {
-            word = unit[Math.floor(num/100)] + ' hundred and ' + Teens[num % 10] 
+            
+            const num = parseInt(inputValue, 10);
+            if (num > 999999999999) {
+                errorEl.textContent = 'Number too large (maximum is 999,999,999,999)';
+                errorEl.style.display = 'block';
+                return;
             }
-            else if (num % 100 >= 20) {
-            word = unit[Math.floor(num/100)] + ' hundred, ' + gettens(num % 100)
+            
+            // Determine currency symbol and name
+            let symbol, currencyName;
+            
+            switch (currencyValue) {
+                case 'naira':
+                    symbol = '₦';
+                    currencyName = 'naira';
+                    break;
+                case 'dollar':
+                    symbol = '$';
+                    currencyName = 'dollars';
+                    break;
+                case 'pounds':
+                    symbol = '£';
+                    currencyName = 'pounds';
+                    break;
+                case 'euro':
+                    symbol = '€';
+                    currencyName = 'euros';
+                    break;
+                default:
+                    symbol = '';
+                    currencyName = '';
             }
-            screen.innerHTML = word + ' ' + symbol;
-
-            return word + ' ' + symbol;                                 
-        }
-
-        function getthousand(num) {
-            let thousand = '';
-            thousand = unit[num/1000] + ' thousand'
-
-            if (num%1000 >0 && num%1000 < 10) {
-            thousand = unit[Math.floor(num/1000)] + ' thousand and ' + unit[num % 100]
-            }
-            else if (num%1000 >=10 && num%1000 <20) {
-            thousand = unit[Math.floor(num/1000)] + ' thousand and ' + Teens[num % 10] 
-            }
-            else if (num%1000 >= 20 && num%1000 <100) {
-            thousand = unit[Math.floor(num/1000)] + ' thousand and ' + gettens(num % 100)
-            }
-            else if (num%1000 >= 100 && num%1000 <= 999) {
-            thousand = unit[Math.floor(num/1000)] + ' thousand, '  + gethundred(num % 1000)
-            }
-            screen.innerHTML = thousand + ' ' + symbol;
+            
+            // Format amount in figures
+            screen1.textContent = `${symbol} ${formatWithCommas(num)}`;
+            
+            // Convert to words
+            const words = convertNumberToWords(num);
+            screen.textContent = words.charAt(0).toUpperCase() + words.slice(1) + ' ' + currencyName;
+            
+            // Clear input for next conversion
+            inputEl.value = '';
+            inputEl.focus();
         }
         
+        // Add event listener for Enter key
+        inputEl.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                convert();
+            }
+        });
+        
+        // Only allow numbers in input field
+        inputEl.addEventListener('input', function() {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
     </script>
+</body>
 </html>
